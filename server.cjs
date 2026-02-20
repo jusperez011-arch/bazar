@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs'); 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -158,7 +158,6 @@ app.get('/hello', (req, res) => {
     res.send("¡Hola desde el Backend! 🥖 Tus panes están listos.");
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Servidor activo en red local`);
-    console.log(`📱 Acceso desde el móvil: http://192.168.100.9:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor activo en el puerto ${PORT}`);
 });
