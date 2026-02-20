@@ -11,18 +11,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    
-    /* ✅ REGLAS RELAJADAS PARA QUE NO SALGA ROJO */
-"strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "erasableSyntaxOnly": false,
-    "noFallthroughCasesInSwitch": false,
-    "noUncheckedSideEffectImports": false
+    "strict": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true
   },
-  "include": ["src"],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["src"]
 }
