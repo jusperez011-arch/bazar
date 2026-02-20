@@ -1,0 +1,141 @@
+[
+  {
+    "id": 1771349163555,
+    "fecha": "17/2/2026, 12:26:03 p. m.",
+    "articulos": [
+      {
+        "nombre": "Marcadores permanente negro",
+        "cantidad": 1,
+        "subtotal": 0.7
+      },
+      {
+        "nombre": "Correctores G",
+        "cantidad": 1,
+        "subtotal": 0.7
+      }
+    ],
+    "total": 1.4
+  },
+  {
+    "id": 1771376521344,
+    "fecha": "17/2/2026, 8:02:01 p. m.",
+    "articulos": [
+      {
+        "nombre": "Plumas estilo Azul",
+        "cantidad": 1,
+        "subtotal": 0.3
+      }
+    ],
+    "total": 0.3
+  },
+  {
+    "id": 1771457776072,
+    "fecha": "18/2/2026, 6:36:16 p. m.",
+    "articulos": [
+      {
+        "nombre": "Barra de cilicona",
+        "cantidad": 1,
+        "subtotal": 0.25
+      },
+      {
+        "nombre": "Galletopsy Mini Vainilla",
+        "cantidad": 1,
+        "subtotal": 0.5
+      },
+      {
+        "nombre": "Alfajor",
+        "cantidad": 1,
+        "subtotal": 0.5
+      },
+      {
+        "nombre": "Topsy Choc Vainilla",
+        "cantidad": 1,
+        "subtotal": 0.25
+      }
+    ],
+    "total": 1.5
+  },
+  {
+    "id": 1771523495687,
+    "fecha": "19/2/2026, 12:51:35 p. m.",
+    "articulos": [
+      {
+        "nombre": "Helado Frozen uva",
+        "cantidad": 1,
+        "subtotal": 0.25
+      }
+    ],
+    "total": 0.25
+  },
+  {
+    "id": 1771523774361,
+    "fecha": "19/2/2026, 12:56:14 p. m.",
+    "articulos": [
+      {
+        "nombre": "Goma Liquida P/50gr",
+        "cantidad": 1,
+        "subtotal": 0.35
+      }
+    ],
+    "total": 0.35
+  },
+  {
+    "id": 1771531975345,
+    "fecha": "19/2/2026, 3:12:55 p. m.",
+    "articulos": [
+      {
+        "nombre": "Choco Choc doble chocolate",
+        "cantidad": 1,
+        "subtotal": 0.25
+      },
+      {
+        "nombre": "Helado Frozen uva",
+        "cantidad": 1,
+        "subtotal": 0.25
+      }
+    ],
+    "total": 0.5
+  },
+  {
+    "id": 1771534819749,
+    "fecha": "19/2/2026, 4:00:19 p. m.",
+    "articulos": [
+      {
+        "nombre": "Topsy Choc Vainilla",
+        "cantidad": 1,
+        "subtotal": 0.25
+      }
+    ],
+    "total": 0.25
+  },
+  {
+    "id": 1771534835050,
+    "fecha": "19/2/2026, 4:00:35 p. m.",
+    "articulos": [
+      {
+        "nombre": "Topsy Choc Vainilla",
+        "cantidad": 1,
+        "subtotal": 0.25
+      }
+    ],
+    "total": 0.25
+  },
+  {
+    "id": 1771609865068,
+    "fecha": "20/2/2026, 12:51:05 p. m.",
+    "articulos": [
+      {
+        "nombre": "Calculadoras Economicas",
+        "cantidad": 1,
+        "subtotal": 1.6
+      },
+      {
+        "nombre": "Borradores Pelican G",
+        "cantidad": 1,
+        "subtotal": 0.3
+      }
+    ],
+    "total": 1.9000000000000001
+  }
+
+]
