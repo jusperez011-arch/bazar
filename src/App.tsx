@@ -13,7 +13,7 @@ import Antigravity from './components/react-bits/Antigravity';
 import { SalesModal } from './components/SalesModal';
 
 // 🛠️ CONFIGURACIÓN DE RED LOCAL (Tu IP de Manta, Ecuador 🇪🇨)
-const API_URL = "http://192.168.100.9:3000";
+fetch('https://bazar-server-vend.onrender.com/products')
 
 interface Product {
   id: number;
