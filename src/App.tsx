@@ -13,7 +13,7 @@ import Antigravity from './components/react-bits/Antigravity';
 import { SalesModal } from './components/SalesModal';
 
 // 🛠️ CONFIGURACIÓN DE RED LOCAL (Tu IP de Manta, Ecuador 🇪🇨)
-fetch('https://bazar-server-vend.onrender.com/products')
+const API_URL = "https://bazar-server-vend.onrender.com";
 
 interface Product {
   id: number;
@@ -70,16 +70,12 @@ export default function App() {
   // ---------------------------------------------------------
   // 🌐 4. CONEXIÓN CON EL SERVIDOR
   // ---------------------------------------------------------
-  useEffect(() => {
+ useEffect(() => {
     fetch(`${API_URL}/products`)
       .then(response => response.json())
       .then((data: Product[]) => setProductList(data))
       .catch(() => {
-        Swal.fire({ 
-          title: 'Servidor Offline', 
-          text: `Asegúrate de que el backend corra en ${API_URL}`, 
-          icon: 'error' 
-        });
+        console.error("Error conectando al servidor de Render");
       });
   }, []);
 
