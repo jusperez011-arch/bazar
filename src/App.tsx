@@ -129,12 +129,10 @@ export default function App() {
   };
 
   const handleCheckout = async () => {
-  if (cartItems.length === 0) return;
-  
-  // Aseguramos que sume números y no concatene textos
-  const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+    if (cartItems.length === 0) return;
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const { value: efectivo } = await Swal.fire({
+    const { value: efectivo } = await Swal.fire({
       title: 'Finalizar Venta',
       html: `
         <div class="text-left">
@@ -234,20 +232,29 @@ export default function App() {
   };
 
   const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
-    try {
-      const response = await fetch(`${API_URL}/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
-      });
-      if (response.ok) {
-        const data: Product[] = await response.json();
-        setProductList(data);
-        setEditingProduct(null);
-        Swal.fire({ title: 'Actualizado', icon: 'success' });
-      }
-    } catch (error) { console.error(error); }
-  };
+  try {
+    // 1. Verificamos la URL en la consola antes de disparar
+    console.log("Enviando a:", `${API_URL}/products/${id}`);
+
+    const response = await fetch(`${API_URL}/products/${id}`, { // <--- REVISA ESTA BARRA /
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setProductList(data);
+      setEditingProduct(null);
+      Swal.fire({ title: 'Actualizado', icon: 'success' });
+    } else {
+      console.error("Error del servidor:", response.status);
+      Swal.fire('Error', 'El servidor no encontró esta ruta (404)', 'error');
+    }
+  } catch (error) { 
+    console.error("Error de red:", error); 
+  }
+};
 
   const deleteProduct = async (id: number) => {
     const result = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true });

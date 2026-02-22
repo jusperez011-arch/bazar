@@ -49,6 +49,35 @@ app.get('/products', async (req, res) => {
 });
 
 // CREAR O ACTUALIZAR PRODUCTO
+
+app.put('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, price, stock, image } = req.body;
+
+    try {
+        // Actualizamos en la base de datos usando los nombres de columna en español
+        await pool.query(
+            'UPDATE productos SET nombre = $1, precio = $2, stock = $3, imagen = $4 WHERE id = $5',
+            [name, price, stock, image, id]
+        );
+
+        // Devolvemos la lista actualizada para que el Frontend se refresque
+        const result = await pool.query(`
+            SELECT 
+                id, 
+                nombre AS name, 
+                precio AS price, 
+                stock, 
+                imagen AS image 
+            FROM productos 
+            ORDER BY id ASC
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error al actualizar el producto");
+    }
+});
 app.post('/products', async (req, res) => {
     const { name, price, stock, image } = req.body;
     
