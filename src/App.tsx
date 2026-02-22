@@ -165,13 +165,21 @@ export default function App() {
     const cambio = parseFloat(efectivo) - total;
 
     try {
-      const response = await fetch(`${API_URL}/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cartItems)
-      });
+  // 🛡️ Creamos una copia del carrito asegurando que las propiedades coincidan
+  const cartToSave = cartItems.map(item => ({
+    id: item.id,
+    name: item.name, // Aseguramos que se llame name
+    price: Number(item.price),
+    quantity: item.quantity
+  }));
 
-      if (response.ok) {
+  const response = await fetch(`${API_URL}/checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cartToSave) // <--- Enviamos la copia limpia
+  });
+
+  if (response.ok) {
         const data = await response.json();
         setProductList(data.updatedProducts);
         setCartItems([]);
