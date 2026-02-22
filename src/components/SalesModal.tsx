@@ -34,26 +34,30 @@ export const SalesModal = ({ isOpen, onClose, sales }: { isOpen: boolean, onClos
           </div>
         </div>
 
-        {/* Lista de Ventas */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {sales.length === 0 ? (
-            <p className="text-center text-gray-400 py-10">Aún no hay ventas registradas...</p>
-          ) : (
-            sales.reverse().map((sale) => (
-              <div key={sale.id} className="border border-gray-100 rounded-2xl p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-2 text-gray-500 text-sm">
-                    <Calendar className="w-4 h-4" /> {sale.fecha}
-                  </div>
-                  <span className="font-bold text-lg text-gray-800">${sale.total.toFixed(2)}</span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  {sale.articulos.map((art: any) => `${art.cantidad}x ${art.nombre}`).join(', ')}
-                </div>
-              </div>
-            ))
-          )}
+       {/* Lista de Ventas - Código Corregido */}
+<div className="flex-1 overflow-y-auto p-6 space-y-4">
+  {sales.length === 0 ? (
+    <p className="text-center text-gray-400 py-10">Aún no hay ventas registradas...</p>
+  ) : (
+    // Quitamos el reverse() de aquí para no alterar el estado original
+    [...sales].reverse().map((sale) => (
+      <div key={sale.id} className="border border-gray-100 rounded-2xl p-4 hover:bg-gray-50 transition-colors">
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center gap-2 text-gray-500 text-sm">
+            <Calendar className="w-4 h-4" /> {new Date(sale.fecha).toLocaleString()}
+          </div>
+          <span className="font-bold text-lg text-gray-800">${Number(sale.total).toFixed(2)}</span>
         </div>
+        <div className="text-xs text-gray-500 font-medium">
+          {/* 🛡️ Cambiamos cantidad -> quantity y nombre -> name */}
+          {sale.articulos.map((art: any) => 
+            `${art.quantity}x ${art.name}`
+          ).join(', ')}
+        </div>
+      </div>
+    ))
+  )}
+</div>
       </div>
     </div>
   );

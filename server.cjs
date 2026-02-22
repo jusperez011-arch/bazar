@@ -62,18 +62,26 @@ app.put('/products/:id', async (req, res) => {
 
 // 💰 RUTA DE CHECKOUT (Única y funcional)
 app.post('/checkout', async (req, res) => {
-    const cartItems = req.body;
+    const cartItems = req.body; // Viene como { name, price, quantity }
     const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+
     try {
+        // Guardamos los artículos tal cual vienen del frontend (en inglés)
+        // para que cuando el frontend los pida de vuelta, los reconozca.
+        await pool.query(
+            'INSERT INTO ventas (articulos, total) VALUES ($1, $2)',
+            [JSON.stringify(cartItems), total] 
+        );
+
+        // Descontar stock (aquí usamos los nombres de la DB: stock, id)
         for (const item of cartItems) {
             await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
-        await pool.query('INSERT INTO ventas (articulos, total) VALUES ($1, $2)', [JSON.stringify(cartItems), total]);
+
         const updated = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json({ message: "Venta exitosa", updatedProducts: updated.rows });
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error en la venta");
+        res.status(500).send("Error");
     }
 });
 
