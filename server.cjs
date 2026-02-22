@@ -20,9 +20,11 @@ const pool = new Pool({
 // 📊 OBTENER HISTORIAL DE VENTAS (Debes crear la tabla 'ventas' en pgAdmin después)
 app.get('/sales', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM ventas ORDER BY fecha DESC');
+        // Usamos ::FLOAT para que el total llegue como número al Frontend
+        const result = await pool.query('SELECT id, fecha, articulos, total::FLOAT FROM ventas ORDER BY fecha DESC');
         res.json(result.rows);
     } catch (err) {
+        console.error("Error al obtener ventas:", err);
         res.json([]); 
     }
 });

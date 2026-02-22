@@ -227,14 +227,21 @@ export default function App() {
 
   const handleOpenSales = async () => {
     try {
-      const response = await fetch(`${API_URL}/sales`);
-      const data: SaleRecord[] = await response.json();
-      setSalesHistory(data);
-      setIsSalesOpen(true);
+        const response = await fetch(`${API_URL}/sales`);
+        const data: SaleRecord[] = await response.json();
+        
+        // 🛡️ Blindaje: Aseguramos que 'total' sea número antes de guardarlo en el estado
+        const cleanSales = data.map(sale => ({
+            ...sale,
+            total: Number(sale.total) || 0
+        }));
+        
+        setSalesHistory(cleanSales);
+        setIsSalesOpen(true);
     } catch (error) {
-      Swal.fire({ title: 'Error', text: 'No se pudo cargar el reporte', icon: 'error' });
+        Swal.fire({ title: 'Error', text: 'No se pudo cargar el reporte', icon: 'error' });
     }
-  };
+};
 
   const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
   try {
