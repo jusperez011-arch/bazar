@@ -50,12 +50,13 @@ app.get('/products', async (req, res) => {
 
 // CREAR O ACTUALIZAR PRODUCTO
 
+// --- ACTUALIZAR PRODUCTO REFORZADO ---
 app.put('/products/:id', async (req, res) => {
     const { id } = req.params;
     const { name, price, stock, image } = req.body;
 
     try {
-        // 🛡️ Forzamos que precio y stock sean números reales antes de ir a la DB
+        // Forzamos que sean números para que la DB no se confunda
         const cleanPrice = Number(price) || 0;
         const cleanStock = Number(stock) || 0;
 
@@ -64,51 +65,38 @@ app.put('/products/:id', async (req, res) => {
             [name, cleanPrice, cleanStock, image, id]
         );
 
-        // Volvemos a pedir la lista con los alias correctos para el Frontend
+        // Devolvemos la lista con alias y asegurando el orden
         const result = await pool.query(`
-            SELECT 
-                id, 
-                nombre AS name, 
-                precio AS price, 
-                stock, 
-                imagen AS image 
-            FROM productos 
-            ORDER BY id ASC
+            SELECT id, nombre AS name, precio AS price, stock, imagen AS image 
+            FROM productos ORDER BY id ASC
         `);
         res.json(result.rows);
     } catch (err) {
-        console.error("Error en PUT:", err);
         res.status(500).send("Error al actualizar");
     }
 });
+
+// --- CHECKOUT QUE SÍ GUARDA EN TU NUEVA TABLA VENTAS ---
 app.post('/checkout', async (req, res) => {
     const cartItems = req.body;
     const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
 
     try {
-        // 1. Descontar Stock
+        // 1. Descontar stock
         for (const item of cartItems) {
             await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
 
-        // 2. Guardar Registro de Venta en la nueva tabla
+        // 2. Insertar en la tabla que creaste en pgAdmin
         await pool.query(
             'INSERT INTO ventas (articulos, total) VALUES ($1, $2)',
             [JSON.stringify(cartItems), total]
         );
 
-        // 3. Obtener productos actualizados con nombres correctos para el Frontend
-        const updatedProducts = await pool.query(`
-            SELECT id, nombre AS name, precio AS price, stock, imagen AS image 
-            FROM productos ORDER BY id ASC
-        `);
-
-        res.json({ 
-            message: "Venta exitosa", 
-            updatedProducts: updatedProducts.rows 
-        });
+        // 3. Devolver productos actualizados
+        const updated = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        res.json({ message: "Venta exitosa", updatedProducts: updated.rows });
     } catch (err) {
-        console.error(err);
         res.status(500).send("Error en la venta");
     }
 });
@@ -126,17 +114,28 @@ app.delete('/products/:id', async (req, res) => {
 });
 
 // 💰 RUTA DE CHECKOUT
+// En tu server.js
 app.post('/checkout', async (req, res) => {
     const cartItems = req.body;
+    const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+
     try {
+        // Descuenta stock
         for (const item of cartItems) {
             await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
-        // Nota: Para guardar la venta en 'ventas', necesitaríamos otra tabla. 
-        // Por ahora, esto ya descuenta el stock de forma permanente.
-        res.json({ message: "Venta exitosa" });
+
+        // 📝 GUARDA LA VENTA (Para que el botón REPORTES funcione)
+        await pool.query(
+            'INSERT INTO ventas (articulos, total) VALUES ($1, $2)',
+            [JSON.stringify(cartItems), total]
+        );
+
+        const updated = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        res.json({ message: "Venta exitosa", updatedProducts: updated.rows });
     } catch (err) {
-        res.status(500).send("Error en la venta");
+        console.error(err);
+        res.status(500).send("Error");
     }
 });
 

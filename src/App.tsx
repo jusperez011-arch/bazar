@@ -128,19 +128,23 @@ export default function App() {
     setCartItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
-  const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+ const handleCheckout = async () => {
+  if (cartItems.length === 0) return;
 
-    const { value: efectivo } = await Swal.fire({
-      title: 'Finalizar Venta',
-      html: `
-        <div class="text-left">
-          <p class="mb-2">Total a pagar: <b class="text-xl">$${total.toFixed(2)}</b></p>
-          <hr class="my-3 border-gray-200">
-          <label class="block text-sm mb-1 text-gray-600">Efectivo recibido:</label>
-          <input id="swal-input-efectivo" class="swal2-input" type="number" step="0.01" placeholder="0.00" style="margin-top: 0;">
-        </div>
+  // 🛡️ Blindamos el cálculo del total asegurando que price sea número
+  const total = cartItems.reduce((sum, item) => {
+    return sum + (Number(item.price || 0) * item.quantity);
+  }, 0);
+
+  const { value: efectivo } = await Swal.fire({
+    title: 'Finalizar Venta',
+    html: `
+      <div class="text-left">
+        <p class="mb-2">Total a pagar: <b class="text-xl">$${Number(total).toFixed(2)}</b></p>
+        <hr class="my-3 border-gray-200">
+        <label class="block text-sm mb-1 text-gray-600">Efectivo recibido:</label>
+        <input id="swal-input-efectivo" class="swal2-input" type="number" step="0.01" placeholder="0.00" style="margin-top: 0;">
+      </div>
       `,
       focusConfirm: false,
       showCancelButton: true,
