@@ -59,6 +59,16 @@ app.put('/products/:id', async (req, res) => {
         res.status(500).send("Error al actualizar");
     }
 });
+// Ruta para vaciar el historial de ventas
+app.delete('/sales', async (req, res) => {
+    try {
+        await pool.query('TRUNCATE TABLE ventas');
+        res.json({ message: "Historial borrado con éxito" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error al vaciar el historial");
+    }
+});
 
 // 💰 RUTA DE CHECKOUT (Única y funcional)
 app.post('/checkout', async (req, res) => {

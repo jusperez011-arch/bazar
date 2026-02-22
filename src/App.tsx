@@ -297,6 +297,42 @@ const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // ---------------------------------------------------------
+// 📊 7. GESTIÓN DE VENTAS
+// ---------------------------------------------------------
+
+const handleClearSales = async () => {
+  const result = await Swal.fire({
+    title: '¿Vaciar historial?',
+    text: "Esta acción borrará todas las ventas registradas permanentemente.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#1a1a1a',
+    confirmButtonText: 'Sí, borrar todo',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await fetch(`${API_URL}/sales`, { 
+        method: 'DELETE' 
+      });
+
+      if (response.ok) {
+        setSalesHistory([]); // Limpiamos la pantalla al instante
+        Swal.fire({
+          title: '¡Historial Borrado!',
+          text: 'El registro de ventas ha sido vaciado.',
+          icon: 'success',
+          confirmButtonColor: '#1a1a1a'
+        });
+      }
+    } catch (error) {
+      Swal.fire('Error', 'No se pudo conectar con el servidor', 'error');
+    }
+  }
+};
+  // ---------------------------------------------------------
   // 7. RENDERIZADO
   // ---------------------------------------------------------
   return (
@@ -393,17 +429,53 @@ const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
           <p className="text-[#A1A1A1] text-xs mt-2 tracking-widest uppercase">© 2026 • Design & Furniture</p>
         </footer>
 
-        {/* 🎭 MODALES */}
-        <InventoryPanel isOpen={isInventoryOpen} onClose={() => setIsInventoryOpen(false)} products={filteredProducts} onEditClick={setEditingProduct} />
-        {editingProduct && <EditProductModal product={editingProduct} onClose={() => setEditingProduct(null)} onSave={handleEditProduct} />}
-        <SalesModal isOpen={isSalesOpen} onClose={() => setIsSalesOpen(false)} sales={salesHistory} />
-        <ShoppingCartComponent 
-          isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} 
-          items={cartItems} onRemoveItem={handleRemoveFromCart} 
-          onClearCart={() => setCartItems([])} onDecreaseQuantity={handleDecreaseQuantity} 
-          onCheckout={handleCheckout} 
-          onIncreaseQuantity={(id) => { const item = cartItems.find(i => i.id === id); if (item) handleAddToCart(item, 1); }} 
-        />
+       {/* 🎭 MODALES */}
+<InventoryPanel 
+  isOpen={isInventoryOpen} 
+  onClose={() => setIsInventoryOpen(false)} 
+  products={filteredProducts} 
+  onEditClick={setEditingProduct} 
+/>
+
+{editingProduct && (
+  <EditProductModal 
+    product={editingProduct} 
+    onClose={() => setEditingProduct(null)} 
+    onSave={handleEditProduct} 
+  />
+)}
+
+{/* ✅ SalesModal: Ahora con la función de borrar historial */}
+<SalesModal 
+  isOpen={isSalesOpen} 
+  onClose={() => setIsSalesOpen(false)} 
+  sales={salesHistory} 
+  onClear={handleClearSales} 
+/>
+
+{/* 🛒 ShoppingCartComponent: Debe mantener sus propias funciones */}
+<ShoppingCartComponent 
+  isOpen={isCartOpen} 
+  onClose={() => setIsCartOpen(false)} 
+  items={cartItems} 
+  onRemoveItem={handleRemoveFromCart} 
+  onClearCart={() => setCartItems([])} 
+  onDecreaseQuantity={handleDecreaseQuantity} 
+  onCheckout={handleCheckout} 
+  onIncreaseQuantity={(id) => { 
+    const item = cartItems.find(i => i.id === id); 
+    if (item) handleAddToCart(item, 1); 
+  }} 
+/>
+
+{selectedProduct && (
+  <ProductModal 
+    isOpen={isModalOpen} 
+    onClose={() => setIsModalOpen(false)} 
+    product={selectedProduct} 
+    onAddToCart={handleAddToCart} 
+  />
+)}
         {selectedProduct && (
           <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={selectedProduct} onAddToCart={handleAddToCart} />
         )}
