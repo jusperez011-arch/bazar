@@ -131,6 +131,7 @@ export default function App() {
  const handleCheckout = async () => {
   if (cartItems.length === 0) return;
 // Actualización para Shirley Bazar 2026
+//hola
   // 🛡️ Blindamos el cálculo del total asegurando que price sea número
   const total = cartItems.reduce((sum, item) => {
     return sum + (Number(item.price || 0) * item.quantity);
