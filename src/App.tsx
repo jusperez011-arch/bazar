@@ -71,13 +71,20 @@ export default function App() {
   // 🌐 4. CONEXIÓN CON EL SERVIDOR
   // ---------------------------------------------------------
  useEffect(() => {
-    fetch(`${API_URL}/products`)
-      .then(response => response.json())
-      .then((data: Product[]) => setProductList(data))
-      .catch(() => {
-        console.error("Error conectando al servidor de Render");
-      });
-  }, []);
+  fetch(`${API_URL}/products`)
+    .then(response => response.json())
+    .then((data: Product[]) => {
+      // 🛡️ Blindaje: Aseguramos que el precio sea SIEMPRE un número
+      const cleanData = data.map(p => ({
+        ...p,
+        price: Number(p.price) || 0
+      }));
+      setProductList(cleanData);
+    })
+    .catch((err) => {
+      console.error("Error conectando al servidor:", err);
+    });
+}, []);
 
   // ---------------------------------------------------------
   // 🛒 5. LÓGICA DEL CARRITO Y VENTA (CHECKOUT)
@@ -122,10 +129,12 @@ export default function App() {
   };
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  if (cartItems.length === 0) return;
+  
+  // Aseguramos que sume números y no concatene textos
+  const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
 
-    const { value: efectivo } = await Swal.fire({
+  const { value: efectivo } = await Swal.fire({
       title: 'Finalizar Venta',
       html: `
         <div class="text-left">
