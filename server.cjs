@@ -55,13 +55,16 @@ app.put('/products/:id', async (req, res) => {
     const { name, price, stock, image } = req.body;
 
     try {
-        // Actualizamos en la base de datos usando los nombres de columna en español
+        // 🛡️ Forzamos que precio y stock sean números reales antes de ir a la DB
+        const cleanPrice = Number(price) || 0;
+        const cleanStock = Number(stock) || 0;
+
         await pool.query(
             'UPDATE productos SET nombre = $1, precio = $2, stock = $3, imagen = $4 WHERE id = $5',
-            [name, price, stock, image, id]
+            [name, cleanPrice, cleanStock, image, id]
         );
 
-        // Devolvemos la lista actualizada para que el Frontend se refresque
+        // Volvemos a pedir la lista con los alias correctos para el Frontend
         const result = await pool.query(`
             SELECT 
                 id, 
@@ -74,33 +77,39 @@ app.put('/products/:id', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error al actualizar el producto");
+        console.error("Error en PUT:", err);
+        res.status(500).send("Error al actualizar");
     }
 });
-app.post('/products', async (req, res) => {
-    const { name, price, stock, image } = req.body;
-    
-    try {
-        // Verificar si existe para actualizar o crear
-        const checkExist = await pool.query('SELECT * FROM productos WHERE LOWER(nombre) = LOWER($1)', [name]);
+app.post('/checkout', async (req, res) => {
+    const cartItems = req.body;
+    const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
 
-        if (checkExist.rows.length > 0) {
-            // ACTUALIZAR STOCK
-            const newStock = Number(checkExist.rows[0].stock) + Number(stock);
-            await pool.query('UPDATE productos SET stock = $1, precio = $2 WHERE nombre = $3', [newStock, price, name]);
-        } else {
-            // INSERTAR NUEVO
-            await pool.query(
-                'INSERT INTO productos (nombre, precio, stock, imagen) VALUES ($1, $2, $3, $4)',
-                [name, price, stock, image || "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1000"]
-            );
+    try {
+        // 1. Descontar Stock
+        for (const item of cartItems) {
+            await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
-        
-        const allProducts = await pool.query('SELECT * FROM productos ORDER BY id ASC');
-        res.json(allProducts.rows);
+
+        // 2. Guardar Registro de Venta en la nueva tabla
+        await pool.query(
+            'INSERT INTO ventas (articulos, total) VALUES ($1, $2)',
+            [JSON.stringify(cartItems), total]
+        );
+
+        // 3. Obtener productos actualizados con nombres correctos para el Frontend
+        const updatedProducts = await pool.query(`
+            SELECT id, nombre AS name, precio AS price, stock, imagen AS image 
+            FROM productos ORDER BY id ASC
+        `);
+
+        res.json({ 
+            message: "Venta exitosa", 
+            updatedProducts: updatedProducts.rows 
+        });
     } catch (err) {
-        res.status(500).send("Error al procesar producto");
+        console.error(err);
+        res.status(500).send("Error en la venta");
     }
 });
 
