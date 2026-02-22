@@ -251,12 +251,9 @@ export default function App() {
     }
 };
 
-  const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
+const handleEditProduct = async (id: number, updatedData: Partial<Product>) => {
   try {
-    // 1. Verificamos la URL en la consola antes de disparar
-    console.log("Enviando a:", `${API_URL}/products/${id}`);
-
-    const response = await fetch(`${API_URL}/products/${id}`, { // <--- REVISA ESTA BARRA /
+    const response = await fetch(`${API_URL}/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedData)
@@ -264,15 +261,24 @@ export default function App() {
 
     if (response.ok) {
       const data = await response.json();
-      setProductList(data);
+
+      // 🛡️ BLINDAJE TOTAL: Convertimos precio y stock a números
+      // Esto evita que .toFixed() rompa la app si el servidor manda un texto
+      const cleanData = data.map((p: any) => ({
+        ...p,
+        price: Number(p.price) || 0,
+        stock: Number(p.stock) || 0
+      }));
+
+      setProductList(cleanData); // Guardamos la lista ya limpia
       setEditingProduct(null);
-      Swal.fire({ title: 'Actualizado', icon: 'success' });
+      Swal.fire({ title: '¡Producto Actualizado!', icon: 'success', confirmButtonColor: '#1a1a1a' });
     } else {
-      console.error("Error del servidor:", response.status);
-      Swal.fire('Error', 'El servidor no encontró esta ruta (404)', 'error');
+      Swal.fire('Error', 'No se pudo actualizar el producto', 'error');
     }
   } catch (error) { 
     console.error("Error de red:", error); 
+    Swal.fire('Error', 'Error de conexión con el servidor', 'error');
   }
 };
 
