@@ -71,22 +71,29 @@ app.delete('/sales', async (req, res) => {
 });
 // ➕ AGREGAR PRODUCTO NUEVO (Esta es la que faltaba)
 app.post('/products', async (req, res) => {
+    // Recibimos los datos del frontend
     const { name, price, stock, image } = req.body;
+    
     try {
         const cleanPrice = Number(price) || 0;
         const cleanStock = Number(stock) || 0;
+        const cleanImage = image || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1000';
         
-        // Insertamos en la base de datos usando los nombres de las columnas reales
+        // Insertamos usando los nombres de columna de tu DB (nombre, precio, stock, imagen)
         await pool.query(
             'INSERT INTO productos (nombre, precio, stock, imagen) VALUES ($1, $2, $3, $4)',
-            [name, cleanPrice, cleanStock, image]
+            [name, cleanPrice, cleanStock, cleanImage]
         );
 
-        // Devolvemos la lista actualizada para que el frontend se refresque
-        const result = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        // Devolvemos la lista actualizada con los alias correctos (AS name, AS price, etc)
+        const result = await pool.query(`
+            SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image 
+            FROM productos ORDER BY id ASC
+        `);
+        
         res.json(result.rows);
     } catch (err) {
-        console.error("Error al guardar producto:", err);
+        console.error("Error al guardar:", err);
         res.status(500).send("Error al guardar el producto");
     }
 });
