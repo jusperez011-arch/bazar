@@ -53,7 +53,7 @@ app.put('/products/:id', async (req, res) => {
             'UPDATE productos SET nombre = $1, precio = $2, stock = $3, imagen = $4 WHERE id = $5',
             [name, cleanPrice, cleanStock, image, id]
         );
-        const result = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+      const result = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json(result.rows);
     } catch (err) {
         res.status(500).send("Error al actualizar");
@@ -114,7 +114,7 @@ app.post('/checkout', async (req, res) => {
             await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
 
-        const updated = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        const updated = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json({ message: "Venta exitosa", updatedProducts: updated.rows });
     } catch (err) {
         res.status(500).send("Error");

@@ -476,9 +476,7 @@ const handleClearSales = async () => {
     onAddToCart={handleAddToCart} 
   />
 )}
-        {selectedProduct && (
-          <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={selectedProduct} onAddToCart={handleAddToCart} />
-        )}
+       
       </div>
     </div>
   );
