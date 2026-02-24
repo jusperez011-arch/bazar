@@ -353,17 +353,17 @@ const handleClearSales = async () => {
                 <p className="text-[10px] text-[#A1A1A1] uppercase tracking-widest mt-1">Premium Collection 2026</p>
               </div>
             </div>
-
-            <div className="flex-1 max-w-md relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1]" />
-              <input
-                type="text"
-                placeholder="Buscar artículos..."
-                className="w-full bg-[#F3F3F3] border border-[#E5E5E5] p-2 pl-10 rounded-full outline-none focus:border-[#1A1A1A] text-sm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+  {/* 🔍 BARRA DE BÚSQUEDA ADAPTABLE */}
+            <div className="flex-1 mx-2 sm:mx-4 relative group">
+  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1]" />
+  <input
+    type="text"
+    placeholder="Buscar..."
+    className="w-full bg-[#F3F3F3] border border-[#E5E5E5] py-2 pl-9 pr-4 rounded-full outline-none focus:border-[#1A1A1A] text-sm transition-all"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+</div>
 
             <div className="flex items-center gap-2">
               <button onClick={handleOpenSales} className="bg-white border border-[#E5E5E5] p-2 rounded-xl hover:bg-green-50 transition-all">
