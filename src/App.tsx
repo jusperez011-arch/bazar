@@ -343,46 +343,63 @@ const handleClearSales = async () => {
 
       <div className="relative z-10">
         <header className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-[#E5E5E5]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center shadow-lg">
-                <Package className="text-white w-6 h-6" />
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold uppercase tracking-tighter">Shirley <span className="font-light opacity-50">Bazar</span></h1>
-                <p className="text-[10px] text-[#A1A1A1] uppercase tracking-widest mt-1">Premium Collection 2026</p>
-              </div>
-            </div>
-  {/* 🔍 BARRA DE BÚSQUEDA ADAPTABLE */}
-            <div className="flex-1 mx-2 sm:mx-4 relative group">
-  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1]" />
-  <input
-    type="text"
-    placeholder="Buscar..."
-    className="w-full bg-[#F3F3F3] border border-[#E5E5E5] py-2 pl-9 pr-4 rounded-full outline-none focus:border-[#1A1A1A] text-sm transition-all"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
-</div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-2 sm:gap-4">
+    
+    {/* LOGO: En móvil solo mostramos el icono para ganar espacio */}
+    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center shadow-lg">
+        <Package className="text-white w-5 h-5 sm:w-6 sm:h-6" />
+      </div>
+      <div className="hidden lg:block">
+        <h1 className="text-xl font-bold uppercase tracking-tighter">Shirley <span className="font-light opacity-50">Bazar</span></h1>
+        <p className="text-[10px] text-[#A1A1A1] uppercase tracking-widest mt-1">Premium Collection 2026</p>
+      </div>
+    </div>
 
-            <div className="flex items-center gap-2">
-              <button onClick={handleOpenSales} className="bg-white border border-[#E5E5E5] p-2 rounded-xl hover:bg-green-50 transition-all">
-                <span className="text-[10px] font-bold px-2 tracking-widest text-green-600">REPORTES</span>
-              </button>
-              <button onClick={() => setIsInventoryOpen(true)} className="bg-white border border-[#E5E5E5] p-2 rounded-xl hover:bg-[#F3F3F3]">
-                <span className="text-[10px] font-bold px-2 tracking-widest">ADMIN</span>
-              </button>
-              <button onClick={() => setIsCartOpen(true)} className="relative p-2 bg-[#1A1A1A] rounded-xl">
-                <ShoppingCart className="w-5 h-5 text-white" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black border border-white text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </header>
+    {/* 🔍 BARRA DE BÚSQUEDA ADAPTABLE: Ocupa el máximo espacio posible */}
+    <div className="flex-1 relative group mx-1 sm:mx-2">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1]" />
+      <input
+        type="text"
+        placeholder="Buscar..."
+        className="w-full bg-[#F3F3F3] border border-[#E5E5E5] py-2 pl-9 pr-4 rounded-full outline-none focus:border-[#1A1A1A] text-sm transition-all"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+
+    {/* BOTONES DE ACCIÓN: Se adaptan a iconos en móvil */}
+    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+      <button 
+        onClick={handleOpenSales} 
+        className="bg-white border border-[#E5E5E5] p-2 rounded-xl hover:bg-green-50 transition-all flex items-center justify-center"
+        title="Reportes"
+      >
+        <span className="hidden sm:inline text-[10px] font-bold px-1 tracking-widest text-green-600">REPORTES</span>
+        <Package className="sm:hidden w-5 h-5 text-green-600" /> {/* Icono para móvil */}
+      </button>
+
+      <button 
+        onClick={() => setIsInventoryOpen(true)} 
+        className="bg-white border border-[#E5E5E5] p-2 rounded-xl hover:bg-[#F3F3F3] flex items-center justify-center"
+        title="Administración"
+      >
+        <span className="hidden sm:inline text-[10px] font-bold px-1 tracking-widest">ADMIN</span>
+        <Search className="sm:hidden w-5 h-5 text-[#1A1A1A]" /> {/* Icono para móvil */}
+      </button>
+
+      <button onClick={() => setIsCartOpen(true)} className="relative p-2 bg-[#1A1A1A] rounded-xl flex-shrink-0">
+        <ShoppingCart className="w-5 h-5 text-white" />
+        {totalItems > 0 && (
+          <span className="absolute -top-1 -right-1 bg-black border border-white text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+            {totalItems}
+          </span>
+        )}
+      </button>
+    </div>
+
+  </div>
+</header>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="relative w-full mb-20 overflow-hidden min-h-[450px] flex items-center rounded-[40px] shadow-sm border border-[#E5E5E5] bg-white">
