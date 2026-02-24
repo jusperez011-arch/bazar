@@ -97,12 +97,17 @@ export function InventoryPanel({ isOpen, onClose, products, onEditClick }: Inven
                     </div>
 
                     {/* El Lápiz de Figma que activamos recién */}
-                    <button 
-                      onClick={() => onEditClick(p)}
-                      className="w-8 h-8 bg-[#2563EB] hover:bg-blue-500 text-white rounded-[8px] flex items-center justify-center shadow-lg transition-all active:scale-90 opacity-0 group-hover:opacity-100"
-                    >
-                      <span className="text-xs">✏️</span>
-                    </button>
+                    {/* ✏️ BOTÓN DE EDITAR MEJORADO PARA MÓVIL */}
+<button 
+  onClick={() => onEditClick(p)}
+  className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-lg transition-all active:scale-95
+             md:opacity-0 md:group-hover:opacity-100 opacity-100 min-w-[40px] justify-center"
+>
+  <span className="text-sm">✏️</span>
+  <span className="text-[10px] font-black uppercase tracking-tighter md:hidden">
+    Editar
+  </span>
+</button>
                   </div>
                 </div>
               ))}
