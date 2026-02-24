@@ -17,7 +17,7 @@ const pool = new Pool({
 
 // --- 2. RUTAS DEL SISTEMA ---
 
-// 📊 OBTENER HISTORIAL DE VENTAS (Con conversión a FLOAT para evitar errores en Frontend)
+// 📊 OBTENER HISTORIAL DE VENTAS
 app.get('/sales', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, fecha, articulos, total::FLOAT FROM ventas ORDER BY fecha DESC');
@@ -28,11 +28,11 @@ app.get('/sales', async (req, res) => {
     }
 });
 
-// 📦 OBTENER PRODUCTOS
+// 📦 OBTENER PRODUCTOS (Corregido con ::FLOAT)
 app.get('/products', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT id, nombre AS name, precio AS price, stock, imagen AS image 
+            SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image 
             FROM productos ORDER BY id ASC
         `);
         res.json(result.rows);
@@ -53,13 +53,14 @@ app.put('/products/:id', async (req, res) => {
             'UPDATE productos SET nombre = $1, precio = $2, stock = $3, imagen = $4 WHERE id = $5',
             [name, cleanPrice, cleanStock, image, id]
         );
-      const result = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        const result = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json(result.rows);
     } catch (err) {
         res.status(500).send("Error al actualizar");
     }
 });
-// Ruta para vaciar el historial de ventas
+
+// 🗑️ VACIAR HISTORIAL DE VENTAS
 app.delete('/sales', async (req, res) => {
     try {
         await pool.query('TRUNCATE TABLE ventas');
@@ -69,71 +70,57 @@ app.delete('/sales', async (req, res) => {
         res.status(500).send("Error al vaciar el historial");
     }
 });
-// ➕ RUTA PARA CREAR PRODUCTOS (Soluciona el 404 y el toFixed)
+
+// ➕ CREAR PRODUCTOS
 app.post('/products', async (req, res) => {
     const { name, price, stock, image } = req.body;
-    
     try {
-        // 1. Limpiamos los datos antes de meterlos a la DB
         const cleanPrice = Number(price) || 0;
         const cleanStock = Number(stock) || 0;
-        
-        // 2. Guardamos en la base de datos
         await pool.query(
             'INSERT INTO productos (nombre, precio, stock, imagen) VALUES ($1, $2, $3, $4)',
             [name, cleanPrice, cleanStock, image || '']
         );
-
-        // 3. ¡IMPORTANTE! Devolvemos la lista usando ::FLOAT para que React reciba NÚMEROS
-        const result = await pool.query(`
-            SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image 
-            FROM productos ORDER BY id ASC
-        `);
-        
+        const result = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json(result.rows);
     } catch (err) {
         console.error("Error al guardar:", err);
         res.status(500).send("Error interno");
     }
 });
-// 💰 RUTA DE CHECKOUT (Única y funcional)
-app.post('/checkout', async (req, res) => {
-    const cartItems = req.body; // Viene como { name, price, quantity }
-    const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
 
+// 💰 CHECKOUT (Ventas)
+app.post('/checkout', async (req, res) => {
+    const cartItems = req.body;
+    const total = cartItems.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
     try {
-        // Guardamos los artículos tal cual vienen del frontend (en inglés)
-        // para que cuando el frontend los pida de vuelta, los reconozca.
         await pool.query(
             'INSERT INTO ventas (articulos, total) VALUES ($1, $2)',
             [JSON.stringify(cartItems), total] 
         );
-
-        // Descontar stock (aquí usamos los nombres de la DB: stock, id)
         for (const item of cartItems) {
             await pool.query('UPDATE productos SET stock = stock - $1 WHERE id = $2', [item.quantity, item.id]);
         }
-
         const updated = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json({ message: "Venta exitosa", updatedProducts: updated.rows });
     } catch (err) {
-        res.status(500).send("Error");
+        res.status(500).send("Error en el checkout");
     }
 });
 
-// 🗑️ ELIMINAR PRODUCTO
+// 🗑️ ELIMINAR PRODUCTO (Corregido con ::FLOAT)
 app.delete('/products/:id', async (req, res) => {
     const id = req.params.id;
     try {
         await pool.query('DELETE FROM productos WHERE id = $1', [id]);
-        const allProducts = await pool.query('SELECT id, nombre AS name, precio AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
+        const allProducts = await pool.query('SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image FROM productos ORDER BY id ASC');
         res.json(allProducts.rows);
     } catch (err) {
         res.status(500).send("Error al borrar");
     }
 });
 
-// 🌐 RUTA DE PRUEBA (Instrucción 25-Ene)
+// 🌐 RUTA DE PRUEBA
 app.get('/test', (req, res) => {
     res.send("Hello from the Backend 🚀");
 });
