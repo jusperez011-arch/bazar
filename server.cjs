@@ -69,23 +69,22 @@ app.delete('/sales', async (req, res) => {
         res.status(500).send("Error al vaciar el historial");
     }
 });
-// ➕ AGREGAR PRODUCTO NUEVO (Esta es la que faltaba)
+// ➕ RUTA PARA CREAR PRODUCTOS (Soluciona el 404 y el toFixed)
 app.post('/products', async (req, res) => {
-    // Recibimos los datos del frontend
     const { name, price, stock, image } = req.body;
     
     try {
+        // 1. Limpiamos los datos antes de meterlos a la DB
         const cleanPrice = Number(price) || 0;
         const cleanStock = Number(stock) || 0;
-        const cleanImage = image || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1000';
         
-        // Insertamos usando los nombres de columna de tu DB (nombre, precio, stock, imagen)
+        // 2. Guardamos en la base de datos
         await pool.query(
             'INSERT INTO productos (nombre, precio, stock, imagen) VALUES ($1, $2, $3, $4)',
-            [name, cleanPrice, cleanStock, cleanImage]
+            [name, cleanPrice, cleanStock, image || '']
         );
 
-        // Devolvemos la lista actualizada con los alias correctos (AS name, AS price, etc)
+        // 3. ¡IMPORTANTE! Devolvemos la lista usando ::FLOAT para que React reciba NÚMEROS
         const result = await pool.query(`
             SELECT id, nombre AS name, precio::FLOAT AS price, stock, imagen AS image 
             FROM productos ORDER BY id ASC
@@ -94,10 +93,9 @@ app.post('/products', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error("Error al guardar:", err);
-        res.status(500).send("Error al guardar el producto");
+        res.status(500).send("Error interno");
     }
 });
-
 // 💰 RUTA DE CHECKOUT (Única y funcional)
 app.post('/checkout', async (req, res) => {
     const cartItems = req.body; // Viene como { name, price, quantity }
