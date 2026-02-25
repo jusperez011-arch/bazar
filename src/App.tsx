@@ -466,7 +466,7 @@ const handleClearSales = async () => {
 <SalesModal 
   isOpen={isSalesOpen} 
   onClose={() => setIsSalesOpen(false)} 
-  sales={salesHistory} 
+  sales={[...salesHistory].reverse()}
   onClear={handleClearSales} 
 />
 
